@@ -1,0 +1,9 @@
+## Interface: 110000
+## Title: LaZMonk Audible and Visual Cues
+## Notes: Tracks Mana Tea, Renewing Mist, Invoke, Life Cocoon, Vivify, and Thunder Focus Tea with alerts.
+## Author: David Honsvick
+## Version: 1.1
+## SavedVariables: LaZMonkDB
+## Icon: Interface\AddOns\LaZMonk\ilaz.tga
+
+LaZMonk.lua
