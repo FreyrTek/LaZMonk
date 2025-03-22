@@ -1,8 +1,0 @@
-## Interface: 110000
-## Title: LaZMonk
-## Notes: Tracks Mana Tea, Renewing Mist, Invoke, Life Cocoon, Vivify, and Thunder Focus Tea with alerts.
-## Author: [Your Name]
-## Version: 1.0
-## SavedVariables: LaZMonkDB
-
-LaZMonk.lua
