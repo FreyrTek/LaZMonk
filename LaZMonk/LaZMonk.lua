@@ -11,7 +11,7 @@ local function IsMistweaverMonk()
     local spec = GetSpecialization()  -- 1-4 for active spec
     local specID = spec and GetSpecializationInfo(spec)  -- Returns spec ID (270 for Mistweaver)
     local isMistweaver = class == "MONK" and specID == 270
-    print("LaZMonk: Class = " .. class .. ", Spec ID = " .. (specID or "nil") .. ", Is Mistweaver = " .. tostring(isMistweaver))
+    -- print("LaZMonk: Class = " .. class .. ", Spec ID = " .. (specID or "nil") .. ", Is Mistweaver = " .. tostring(isMistweaver))
     return isMistweaver
 end
 
@@ -76,6 +76,54 @@ dragTab:SetScript("OnDragStop", function(self)
     LaZMonkDB.position.relativePoint = relativePoint
     LaZMonkDB.position.xOfs = xOfs
     LaZMonkDB.position.yOfs = yOfs
+end)
+
+-- Create the mute button
+local muteButton = CreateFrame("Button", "LaZMonkMuteButton", groupFrame)
+muteButton:SetSize(10, 10)
+muteButton:SetPoint("RIGHT", dragTab, "LEFT", -2, 0)
+muteButton:EnableMouse(true)
+
+local muteTexture = muteButton:CreateTexture(nil, "BACKGROUND")
+muteTexture:SetAllPoints(muteButton)
+muteTexture:SetColorTexture(0, 0, 1, 1)
+
+local muteBorderTop = muteButton:CreateTexture(nil, "BORDER")
+muteBorderTop:SetColorTexture(0, 0, 0, 1)
+muteBorderTop:SetPoint("TOPLEFT", muteButton, "TOPLEFT", 0, 0)
+muteBorderTop:SetPoint("TOPRIGHT", muteButton, "TOPRIGHT", 0, 0)
+muteBorderTop:SetHeight(1)
+
+local muteBorderBottom = muteButton:CreateTexture(nil, "BORDER")
+muteBorderBottom:SetColorTexture(0, 0, 0, 1)
+muteBorderBottom:SetPoint("BOTTOMLEFT", muteButton, "BOTTOMLEFT", 0, 0)
+muteBorderBottom:SetPoint("BOTTOMRIGHT", muteButton, "BOTTOMRIGHT", 0, 0)
+muteBorderBottom:SetHeight(1)
+
+local muteBorderLeft = muteButton:CreateTexture(nil, "BORDER")
+muteBorderLeft:SetColorTexture(0, 0, 0, 1)
+muteBorderLeft:SetPoint("TOPLEFT", muteButton, "TOPLEFT", 0, 0)
+muteBorderLeft:SetPoint("BOTTOMLEFT", muteButton, "BOTTOMLEFT", 0, 0)
+muteBorderLeft:SetWidth(1)
+
+local muteBorderRight = muteButton:CreateTexture(nil, "BORDER")
+muteBorderRight:SetColorTexture(0, 0, 0, 1)
+muteBorderRight:SetPoint("TOPRIGHT", muteButton, "TOPRIGHT", 0, 0)
+muteBorderRight:SetPoint("BOTTOMRIGHT", muteButton, "BOTTOMRIGHT", 0, 0)
+muteBorderRight:SetWidth(1)
+
+local function UpdateMuteButton()
+    if LaZMonkDB.muted then
+        muteTexture:SetColorTexture(1, 1, 0, 1)  -- Yellow when muted
+    else
+        muteTexture:SetColorTexture(0, 0, 1, 1)  -- Blue when unmuted
+    end
+end
+
+muteButton:SetScript("OnClick", function()
+    LaZMonkDB.muted = not LaZMonkDB.muted
+    UpdateMuteButton()
+    print("LaZMonk: Sound " .. (LaZMonkDB.muted and "muted" or "unmuted"))
 end)
 
 -- Mana Tea frame (top-right)
@@ -213,6 +261,17 @@ local function FormatCooldown(seconds)
     end
 end
 
+-- Sound helper function
+local function PlaySoundIfUnmuted(sound, channel)
+    if not LaZMonkDB.muted then
+        if type(sound) == "number" then
+            PlaySound(sound, channel)
+        else
+            PlaySoundFile(sound, channel)
+        end
+    end
+end
+
 -- Determine active Invoke talent
 local function DetermineActiveInvoke()
     if IsPlayerSpell(CHI_JI_SPELL_ID) then
@@ -247,14 +306,14 @@ local function UpdateManaTea()
     end
     if count ~= lastManaTeaStacks and isInitialized then
         if count == 10 then
-            PlaySound(113999, "Master")
-            C_Timer.After(0.5, function() PlaySound(113999, "Master") end)
+            PlaySoundIfUnmuted(113999, "Master")
+            C_Timer.After(0.5, function() PlaySoundIfUnmuted(113999, "Master") end)
         elseif count == 20 then
-            PlaySoundFile("Interface\\AddOns\\LaZMonk\\Sounds\\20stacks.ogg", "Master")
+            PlaySoundIfUnmuted("Interface\\AddOns\\LaZMonk\\Sounds\\20stacks.ogg", "Master")
             if manaTeaTimer then manaTeaTimer:Cancel() end
             manaTeaTimer = C_Timer.NewTimer(60, function()
                 if AuraUtil.FindAuraByName("Mana Tea", "player", "HELPFUL") and count == 20 then
-                    PlaySoundFile("Interface\\AddOns\\LaZMonk\\Sounds\\lazyMonk.ogg", "Master")
+                    PlaySoundIfUnmuted("Interface\\AddOns\\LaZMonk\\Sounds\\lazyMonk.ogg", "Master")
                 end
             end)
         elseif count < 20 and manaTeaTimer then
@@ -273,7 +332,7 @@ local function UpdateRenewingMist()
     renewingMistChargeText:SetText(charges > 0 and charges or "")
     renewingMistFrame:SetShown(charges > 0)
     if isInitialized and lastRenewingMistCharges == 0 and charges == 1 then
-        PlaySoundFile("Interface\\AddOns\\LaZMonk\\Sounds\\healingMist.ogg", "Master")
+        PlaySoundIfUnmuted("Interface\\AddOns\\LaZMonk\\Sounds\\healingMist.ogg", "Master")
     end
     lastRenewingMistCharges = charges
 end
@@ -309,7 +368,7 @@ local function UpdateInvoke()
             invokeIcon:SetTexture(activeInvokeIcon)
             invokeFrame:Show()
             if isInitialized then
-                PlaySoundFile("Interface\\AddOns\\LaZMonk\\Sounds\\celestial.ogg", "Master")
+                PlaySoundIfUnmuted("Interface\\AddOns\\LaZMonk\\Sounds\\celestial.ogg", "Master")
             end
         else
             invokeFrame:Hide()
@@ -329,7 +388,7 @@ local function UpdateLifeCocoon()
     if isOffCooldown then
         lifeCocoonFrame:Show()
         if wasLifeCocoonOnCooldown and isInitialized then
-            PlaySoundFile("Interface\\AddOns\\LaZMonk\\Sounds\\cacoon.ogg", "Master")
+            PlaySoundIfUnmuted("Interface\\AddOns\\LaZMonk\\Sounds\\cacoon.ogg", "Master")
         end
         wasLifeCocoonOnCooldown = false
     else
@@ -344,8 +403,8 @@ local function UpdateVivify()
     if name then
         vivifyFrame:Show()
         if not vivifySoundPlayed and isInitialized then
-            PlaySound(5274, "Master")
-            PlaySoundFile("Interface\\AddOns\\LaZMonk\\Sounds\\FreeHeal.ogg", "Master")
+            PlaySoundIfUnmuted(5274, "Master")
+            --PlaySoundIfUnmuted("Interface\\AddOns\\LaZMonk\\Sounds\\FreeHeal.ogg", "Master")
             vivifySoundPlayed = true
         end
     else
@@ -367,7 +426,7 @@ end
 local function OnSpellCast(unit, _, spellId)
     if unit == "player" and isInitialized then
         if spellId == YULON_SPELL_ID or spellId == CHI_JI_SPELL_ID then
-            PlaySoundFile("Interface\\AddOns\\LaZMonk\\Sounds\\sausage.ogg", "Master")
+            PlaySoundIfUnmuted("Interface\\AddOns\\LaZMonk\\Sounds\\sausage.ogg", "Master")
             celestial_available = false
         end
     end
@@ -404,7 +463,7 @@ eventFrame:SetScript("OnEvent", function(self, event, unit, ...)
         UpdateLifeCocoon()
         UpdateThunderFocusTea()
     elseif event == "PLAYER_TALENT_UPDATE" then
-        print("LaZMonk: Talent update detected")
+        --print("LaZMonk: Talent update detected")
         if not IsMistweaverMonk() then
             groupFrame:Hide()
             return
@@ -427,11 +486,13 @@ eventFrame:SetScript("OnEvent", function(self, event, unit, ...)
         UpdateThunderFocusTea()
         groupFrame:Show()  -- Ensure frame is visible after talent update
     elseif event == "PLAYER_LOGIN" then
-        print("LaZMonk: Player login detected")
+        --print("LaZMonk: Player login detected")
         if not IsMistweaverMonk() then
             groupFrame:Hide()
             return
         end
+        LaZMonkDB.muted = LaZMonkDB.muted or false  -- Default to unmuted
+        UpdateMuteButton()
         if LaZMonkDB and LaZMonkDB.position then
             local pos = LaZMonkDB.position
             groupFrame:ClearAllPoints()
@@ -463,8 +524,12 @@ SlashCmdList["LAZMONK"] = function(msg)
             groupFrame:Show()
             print("LaZMonk: Frame shown")
         end
+    elseif msg == "togglesound" then
+        LaZMonkDB.muted = not LaZMonkDB.muted
+        UpdateMuteButton()
+        print("LaZMonk: Sound " .. (LaZMonkDB.muted and "muted" or "unmuted"))
     else
-        print("LaZMonk: Use '/lazmonk toggle' to show or hide the frame")
+        print("LaZMonk: Use '/lazmonk toggle' to show or hide the frame, or '/lazmonk togglesound' to toggle sound")
     end
 end
 
