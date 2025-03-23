@@ -309,11 +309,11 @@ local function UpdateManaTea()
             PlaySoundIfUnmuted(113999, "Master")
             C_Timer.After(0.5, function() PlaySoundIfUnmuted(113999, "Master") end)
         elseif count == 20 then
-            PlaySoundIfUnmuted("Interface\\AddOns\\LaZMonk\\Sounds\\20stacks.ogg", "Master")
+            PlaySoundIfUnmuted("Interface\\AddOns\\LaZMonk-main\\Sounds\\20stacks.ogg", "Master")
             if manaTeaTimer then manaTeaTimer:Cancel() end
             manaTeaTimer = C_Timer.NewTimer(60, function()
                 if AuraUtil.FindAuraByName("Mana Tea", "player", "HELPFUL") and count == 20 then
-                    PlaySoundIfUnmuted("Interface\\AddOns\\LaZMonk\\Sounds\\lazyMonk.ogg", "Master")
+                    PlaySoundIfUnmuted("Interface\\AddOns\\LaZMonk-main\\Sounds\\lazyMonk.ogg", "Master")
                 end
             end)
         elseif count < 20 and manaTeaTimer then
@@ -332,7 +332,7 @@ local function UpdateRenewingMist()
     renewingMistChargeText:SetText(charges > 0 and charges or "")
     renewingMistFrame:SetShown(charges > 0)
     if isInitialized and lastRenewingMistCharges == 0 and charges == 1 then
-        PlaySoundIfUnmuted("Interface\\AddOns\\LaZMonk\\Sounds\\healingMist.ogg", "Master")
+        PlaySoundIfUnmuted("Interface\\AddOns\\LaZMonk-main\\Sounds\\healingMist.ogg", "Master")
     end
     lastRenewingMistCharges = charges
 end
@@ -368,7 +368,7 @@ local function UpdateInvoke()
             invokeIcon:SetTexture(activeInvokeIcon)
             invokeFrame:Show()
             if isInitialized then
-                PlaySoundIfUnmuted("Interface\\AddOns\\LaZMonk\\Sounds\\celestial.ogg", "Master")
+                PlaySoundIfUnmuted("Interface\\AddOns\\LaZMonk-main\\Sounds\\celestial.ogg", "Master")
             end
         else
             invokeFrame:Hide()
@@ -388,7 +388,7 @@ local function UpdateLifeCocoon()
     if isOffCooldown then
         lifeCocoonFrame:Show()
         if wasLifeCocoonOnCooldown and isInitialized then
-            PlaySoundIfUnmuted("Interface\\AddOns\\LaZMonk\\Sounds\\cacoon.ogg", "Master")
+            PlaySoundIfUnmuted("Interface\\AddOns\\LaZMonk-main\\Sounds\\cacoon.ogg", "Master")
         end
         wasLifeCocoonOnCooldown = false
     else
@@ -404,7 +404,7 @@ local function UpdateVivify()
         vivifyFrame:Show()
         if not vivifySoundPlayed and isInitialized then
             PlaySoundIfUnmuted(5274, "Master")
-            --PlaySoundIfUnmuted("Interface\\AddOns\\LaZMonk\\Sounds\\FreeHeal.ogg", "Master")
+            --PlaySoundIfUnmuted("Interface\\AddOns\\LaZMonk-main\\Sounds\\FreeHeal.ogg", "Master")
             vivifySoundPlayed = true
         end
     else
@@ -426,7 +426,7 @@ end
 local function OnSpellCast(unit, _, spellId)
     if unit == "player" and isInitialized then
         if spellId == YULON_SPELL_ID or spellId == CHI_JI_SPELL_ID then
-            PlaySoundIfUnmuted("Interface\\AddOns\\LaZMonk\\Sounds\\sausage.ogg", "Master")
+            PlaySoundIfUnmuted("Interface\\AddOns\\LaZMonk-main\\Sounds\\sausage.ogg", "Master")
             celestial_available = false
         end
     end
