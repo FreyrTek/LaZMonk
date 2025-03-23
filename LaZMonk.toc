@@ -4,6 +4,6 @@
 ## Author: David Honsvick
 ## Version: 1.1
 ## SavedVariables: LaZMonkDB
-## Icon: Interface\AddOns\LaZMonk\ilaz.tga
+## Icon: Interface\AddOns\LaZMonk-main\ilaz.tga
 
 LaZMonk.lua
